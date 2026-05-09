@@ -27,14 +27,9 @@ workflows:
         script: |
           flutter pub get
 
-      - name: Ensure Android platform
-        script: |
-          if [ ! -d android ]; then
-            flutter create . --platforms=android --org com.onimglitch
-          fi
-
       - name: Build release APK
         script: |
+          chmod +x android/gradlew
           flutter build apk --release
 
     artifacts:
