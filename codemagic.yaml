@@ -1,0 +1,44 @@
+# Codemagic CI: Flutter Android APK builds (no Android Studio required).
+# Repo: configure this app at https://codemagic.io and connect your Git repo.
+# For Play Store uploads, add Android code signing in Codemagic (credentials / keystore).
+
+workflows:
+  android-apk:
+    name: Android APK
+    max_build_duration: 120
+    instance_type: linux_x2
+
+    environment:
+      flutter: stable
+
+    triggering:
+      events:
+        - push
+        - pull_request
+        - tag
+      branch_patterns:
+        - pattern: main
+          include: true
+          source: false
+      cancel_previous_builds: true
+
+    scripts:
+      - name: Dependencies
+        script: |
+          flutter pub get
+
+      - name: Ensure Android platform
+        script: |
+          if [ ! -d android ]; then
+            flutter create . --platforms=android --org com.onimglitch
+          fi
+
+      - name: Build release APK
+        script: |
+          flutter build apk --release
+
+    artifacts:
+      - build/app/outputs/flutter-apk/*.apk
+
+    # Optional: enable email/slack/GitHub Releases in Codemagic UI → Publishing,
+    # or add a publishing block here — https://docs.codemagic.io/yaml/yaml-getting-started/
